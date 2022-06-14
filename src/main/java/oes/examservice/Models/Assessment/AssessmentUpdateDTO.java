@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Data @AllArgsConstructor @NoArgsConstructor
 public class AssessmentUpdateDTO {
+    private String AssessmentTitle;
     private Date startTime;
     private Date endTime;
 }

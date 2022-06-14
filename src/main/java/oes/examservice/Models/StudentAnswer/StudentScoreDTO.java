@@ -8,5 +8,6 @@ public class StudentScoreDTO {
     private String idStudent;
     private String idExam;
     private String idQt;
+    private boolean isCorrectAnswer;
     private double score;
 }

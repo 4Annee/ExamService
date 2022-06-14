@@ -23,7 +23,8 @@ public class Question {
     @ElementCollection
     List<String> Choices;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     @JoinTable(name = "question_solution",
             joinColumns = @JoinColumn(name = "question_null"),
             inverseJoinColumns = @JoinColumn(name = "solution_id"))

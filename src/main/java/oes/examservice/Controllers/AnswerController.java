@@ -1,19 +1,13 @@
 package oes.examservice.Controllers;
 
+import oes.examservice.Entities.*;
 import oes.examservice.Entities.CompositeKeys.CompositeAnswerKey;
 import oes.examservice.Entities.CompositeKeys.CompositeExamKey;
 import oes.examservice.Entities.Enums.QuestionType;
-import oes.examservice.Entities.Question;
-import oes.examservice.Entities.Solution;
-import oes.examservice.Entities.StudentAnswer;
-import oes.examservice.Entities.StudentPassedExam;
 import oes.examservice.Models.StudentAnswer.StudentAnswerDTO;
 import oes.examservice.Models.StudentAnswer.StudentPassedExamDTO;
 import oes.examservice.Models.StudentAnswer.StudentScoreDTO;
-import oes.examservice.Repositories.QuestionRepository;
-import oes.examservice.Repositories.SolutionRepository;
-import oes.examservice.Repositories.StudentAnswerRepository;
-import oes.examservice.Repositories.StudentPassedExamRepository;
+import oes.examservice.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +22,8 @@ public class AnswerController {
     @Autowired
     StudentPassedExamRepository exrepo;
     @Autowired
+    AssessmentRepository arepo;
+    @Autowired
     QuestionRepository qtrepo;
 
 
@@ -38,12 +34,14 @@ public class AnswerController {
 
     @PostMapping("/Pass")
     public StudentPassedExam passingExam(@RequestBody StudentPassedExamDTO dto){
-        return exrepo.save(new StudentPassedExam(new CompositeExamKey(dto.getIdstudent(),dto.getIdExam()),0.0,false,null));
+        Assessment a = arepo.findById(dto.getIdExam()).get();
+        return exrepo.save(new StudentPassedExam(new CompositeExamKey(dto.getIdstudent(),dto.getIdExam()),0.0,false,null,a));
     }
 
     @PostMapping("/Submit")
     public StudentAnswer answerSubmit(@RequestBody StudentAnswerDTO dto){
-        StudentAnswer an = new StudentAnswer(new CompositeAnswerKey(dto.getIdStudent(), dto.getIdExam(), dto.getIdQt()),dto.getAnswer(),0);
+        StudentPassedExam ps = exrepo.findById(new CompositeExamKey(dto.getIdStudent(),dto.getIdExam())).get();
+        StudentAnswer an = new StudentAnswer(new CompositeAnswerKey(dto.getIdStudent(),dto.getIdExam(), dto.getIdQt()),dto.getAnswer(),0,false,ps);
         Question qt = qtrepo.findById(dto.getIdQt()).get();
 
         an.setScore(an.getAnswer()==qt.getSolution().getAnswer()?qt.getScore():0);
@@ -57,6 +55,7 @@ public class AnswerController {
         StudentPassedExam ps = exrepo.findById(new CompositeExamKey(dto.getIdStudent(), dto.getIdExam())).get();
         ps.setFinalscore(ps.getFinalscore()-an.getScore() + dto.getScore());
         an.setScore(dto.getScore());
+        an.setCorrectanswer(dto.isCorrectAnswer());
         repo.save(an);
         return exrepo.save(ps);
     }

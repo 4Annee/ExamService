@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, CompositeAnswerKey> {
-    @Query("select s from StudentAnswer s where s.id.idStudent = :idStudent and s.id.idExam = :idExam ")
+    @Query("select s from StudentAnswer s where s.id.idAnswer = :idStudent and s.id.idStudExam = :idExam ")
     List<StudentAnswer> getStudentAnswers(String idStudent, String idExam);
 }

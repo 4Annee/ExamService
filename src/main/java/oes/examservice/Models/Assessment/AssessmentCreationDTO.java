@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data @AllArgsConstructor @NoArgsConstructor
 public class AssessmentCreationDTO {
     private String moduleId;
+    private String AssessmentTitle;
     private Date startTime;
     private Date endTime;
 }

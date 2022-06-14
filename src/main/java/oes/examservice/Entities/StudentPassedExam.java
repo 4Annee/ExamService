@@ -1,5 +1,6 @@
 package oes.examservice.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,7 @@ public class StudentPassedExam {
     private boolean corrected;
     @OneToMany(cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private Collection<StudentAnswer> answers;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Assessment assessment;
 }

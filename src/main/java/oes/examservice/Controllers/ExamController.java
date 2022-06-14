@@ -1,11 +1,11 @@
 package oes.examservice.Controllers;
 
-import oes.examservice.Entities.Assessment;
+import oes.examservice.Entities.*;
 import oes.examservice.Entities.CompositeKeys.CompositeExamKey;
-import oes.examservice.Entities.Question;
-import oes.examservice.Entities.Solution;
-import oes.examservice.Entities.StudentAnswer;
+import oes.examservice.Mappers.AssessmentMapper;
 import oes.examservice.Models.Assessment.AssessmentCreationDTO;
+import oes.examservice.Models.Assessment.AssessmentDTO;
+import oes.examservice.Models.Assessment.AssessmentResultDTO;
 import oes.examservice.Models.Assessment.AssessmentUpdateDTO;
 import oes.examservice.Models.Question.QuestionCreationDTO;
 import oes.examservice.Models.Question.QuestionUpdateDTO;
@@ -14,10 +14,10 @@ import oes.examservice.Models.Solution.SolutionUpdateDTO;
 import oes.examservice.Repositories.AssessmentRepository;
 import oes.examservice.Repositories.QuestionRepository;
 import oes.examservice.Repositories.SolutionRepository;
+import oes.examservice.Repositories.StudentPassedExamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,15 +31,40 @@ public class ExamController {
     QuestionRepository questionRepository;
     @Autowired
     SolutionRepository solutionRepository;
+    @Autowired
+    StudentPassedExamRepository passedExamRepository;
+
+
+    @GetMapping("/Score/")
+    public double getStudentScore(@RequestBody CompositeExamKey key){
+        StudentPassedExam ps = passedExamRepository.findById(new CompositeExamKey(key.getIdStudent(), key.getIdExam())).get();
+        return ps.getFinalscore();
+    }
+
+    @GetMapping("/Modules/")
+    public List<AssessmentDTO> getUpcomingExams(@RequestBody String[] moduleids){
+        List<Assessment> assessments = assessmentRepository.getAssessmentsByModuleIdIn(moduleids);
+        List<AssessmentDTO> assessmentDTOS = new ArrayList<>();
+        for (Assessment a :
+                assessments) {
+            assessmentDTOS.add(new AssessmentDTO(a.getAssessmentTitle(),a.getModuleId(),a.getStarttime(),a.getEndtime()));
+        }
+        return assessmentDTOS;
+    }
+
+    @GetMapping("/Student/Passed/{id}")
+    public List<AssessmentResultDTO> getExamScoresByStudentID(@PathVariable("id") String id){
+        return AssessmentMapper.getAssessmentForStudent(passedExamRepository.getStudentexams(id).stream().limit(10).toList());
+    }
 
     @GetMapping("/{id}")
-    public Assessment getStudentAnswersByExamByStudent(@PathVariable("id") String id){
+    public Assessment getExamDetails(@PathVariable("id") String id){
         return assessmentRepository.findById(id).get() ;
     }
 
     @PostMapping("/")
     public Assessment newExamCreated(@RequestBody AssessmentCreationDTO dto){
-        return assessmentRepository.save(new Assessment(null, dto.getModuleId(),dto.getStartTime(),dto.getEndTime(),false,null));
+        return assessmentRepository.save(new Assessment(null,dto.getAssessmentTitle(), dto.getModuleId(),dto.getStartTime(),dto.getEndTime(),false,null,null));
     }
 
     @PostMapping("/publish/{id}")
@@ -52,6 +77,7 @@ public class ExamController {
     @PutMapping("/update/{id}")
     public boolean updateExam(@PathVariable("id")String id, @RequestBody AssessmentUpdateDTO dto){
         Assessment a = assessmentRepository.findById(id).get();
+        a.setAssessmentTitle(dto.getAssessmentTitle());
         a.setStarttime(dto.getStartTime());
         a.setEndtime(dto.getEndTime());
         assessmentRepository.save(a);

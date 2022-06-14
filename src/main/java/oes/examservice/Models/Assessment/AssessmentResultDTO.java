@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data @AllArgsConstructor @NoArgsConstructor
-public class AssessmentDTO {
+public class AssessmentResultDTO {
     private String AssessmentTitle;
     private Date passingDate;
     private double finalScore;

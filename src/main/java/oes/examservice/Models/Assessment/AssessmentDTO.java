@@ -7,6 +7,7 @@ import java.util.Date;
 
 @Data @AllArgsConstructor @NoArgsConstructor
 public class AssessmentDTO {
+    private String assessmentId;
     private String assessmentTitle;
     private String moduleId;
     private Date startTime;

@@ -16,6 +16,7 @@ public class StudentPassedExam {
     private CompositeExamKey id;
     private double finalscore;
     private boolean corrected;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private Collection<StudentAnswer> answers;
     @JsonIgnore

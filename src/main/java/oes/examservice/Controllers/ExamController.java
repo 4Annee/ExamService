@@ -41,13 +41,18 @@ public class ExamController {
         return ps.getFinalscore();
     }
 
+    @GetMapping("/Score/{idexam}")
+    public List<StudentPassedExam> getStudentsScore(@PathVariable String idexam){
+        return passedExamRepository.getExamScores(idexam);
+    }
+
     @GetMapping("/Modules/")
     public List<AssessmentDTO> getUpcomingExams(@RequestBody String[] moduleids){
         List<Assessment> assessments = assessmentRepository.getAssessmentsByModuleIdIn(moduleids);
         List<AssessmentDTO> assessmentDTOS = new ArrayList<>();
         for (Assessment a :
                 assessments) {
-            assessmentDTOS.add(new AssessmentDTO(a.getAssessmentTitle(),a.getModuleId(),a.getStarttime(),a.getEndtime()));
+            assessmentDTOS.add(new AssessmentDTO(a.getId(),a.getAssessmentTitle(),a.getModuleId(),a.getStarttime(),a.getEndtime()));
         }
         return assessmentDTOS;
     }

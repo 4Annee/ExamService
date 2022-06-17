@@ -48,11 +48,14 @@ public class ExamController {
 
     @GetMapping("/Modules/")
     public List<AssessmentDTO> getUpcomingExams(@RequestBody String[] moduleids){
-        List<Assessment> assessments = assessmentRepository.getAssessmentsByModuleIdIn(moduleids);
         List<AssessmentDTO> assessmentDTOS = new ArrayList<>();
-        for (Assessment a :
-                assessments) {
-            assessmentDTOS.add(new AssessmentDTO(a.getId(),a.getAssessmentTitle(),a.getModuleId(),a.getStarttime(),a.getEndtime()));
+        for (String m :
+                moduleids) {
+            List<Assessment> assessments = assessmentRepository.getAssessmentsByModuleId(m);
+            for (Assessment a :
+                    assessments) {
+                assessmentDTOS.add(new AssessmentDTO(a.getId(),a.getAssessmentTitle(),a.getModuleId(),a.getStarttime(),a.getEndtime()));
+            }
         }
         return assessmentDTOS;
     }
@@ -62,7 +65,7 @@ public class ExamController {
         return AssessmentMapper.getAssessmentForStudent(passedExamRepository.getStudentexams(id).stream().limit(10).toList());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/Exam/{id}")
     public Assessment getExamDetails(@PathVariable("id") String id){
         return assessmentRepository.findById(id).get() ;
     }
